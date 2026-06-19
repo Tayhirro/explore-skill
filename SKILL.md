@@ -182,7 +182,7 @@ AI 应直接使用下面的框架分析当前对象。
 - 每个回答焦点都要记录回答深度：overview / standard / deep。
   - overview：用户只要概括或快速理解，Round 1 通常可以满足。
   - standard：用户要解释清楚主要依据和边界，Round 1 后必须过 Evidence Sufficiency Gate。
-  - deep：用户明确要求“深入 / 每个 / 逐项 / 多视角 / 证据 / 机制 / 公式原理 / 计算过程 / 各模型 / 各场景 / 是否成立 / 值得学习”，相关 answer units 默认需要 Round 2 聚焦调研，除非 evidence ledger 已证明 Round 1 足够。
+  - deep：用户明确要求“深入 / 每个 / 逐项 / 多视角 / 证据 / 机制 / 是否成立 / 值得学习”，相关 answer units 默认需要 Round 2 聚焦调研，除非 evidence ledger 已证明 Round 1 足够。
 - `research.md` 中至少记录：
   - focus_id：
   - 用户原始问法片段：
@@ -196,7 +196,6 @@ Round 1：Orientation / Problem Framing
 - 目标：理解对象、背景、旧方法、理论语境和证据来源，让主 agent 建立 problem representation。
 - 如果输入是论文、综述或文章，第一个子任务必须是 A：原文结构理解，覆盖文章主线、章节 / taxonomy、核心 claim、关键模块、作者贡献和证据组织方式。
 - 其他子任务按证据来源、学科背景、相关工作、理论依据、实验来源或失败边界拆分。
-- PDF 解析、全文抽取、通读原文或把公式摘出来，只是材料获取，不等于完成 Round 1。只要用户显式使用本 skill 且问题包含“研究深入 / 详细公式原理 / 各模型 / 各场景 / 逐项解释”等深度信号，必须先建立 `research.md`、回答焦点表和 Round 1 子任务清单，再进入 checkpoint。
 - Round 1 可以形成初步答案草稿，但不能只凭“整体上看起来够了”直接结束；如果已经派发子 agent，必须先进入 checkpoint。
 
 Round Checkpoint：每轮结束后的主 agent 收敛动作
@@ -235,7 +234,6 @@ Evidence Sufficiency Gate：判断是否足够，不用主 agent 的主观自信
 - 对“深入分析每个创新点 / 每个机制 / 多视角求证 / 是否真的成立 / 值得学习什么”：每个创新点必须成为独立 answer unit，并默认进入 Round 2 做多视角分析，覆盖旧方法对比、机制链、实验或 ablation、理论依据、反例边界和可迁移条件；只有 evidence ledger 明确证明这些维度在 Round 1 已足够时，才能不进入 Round 2。
 - 缺组件级 ablation、直接 baseline 对照、反例边界或外部对照，不自动等于失败；它表示该回答焦点的结论强度需要被检查。若用户只是 overview，可降级说明后 resolved；若用户要求 deep，则默认 needs_round2 或 weak，不能强行 resolved。
 - 对机制解释：至少要有待解释现象、因果链、关键变量、直接或间接证据、替代解释和失败边界。
-- 对公式计算 / 模型推导解释：至少要有公式所在章节或表格、适用信道 / 场景 / 模型、变量定义与单位、物理或统计来源、计算步骤、参数如何获得、公式之间的继承关系、假设条件和失效边界。长 PDF、survey 或多模型材料中，不能只凭主 agent 全文抽取后的公式列表直接 final；必须先把公式族映射成 answer units，并经过 checkpoint。
 - 对判定 / 评价：至少要有待判定命题、判定标准、支持证据、反证或缺失证据、结论强度。
 - 对概念映射：至少要有源概念、目标理论、可映射部分、不能映射部分和支持类型。
 - 如果某个 answer unit 影响最终答案，但证据账本只记录了单来源、作者自述、弱相关文献或未核查引用，不能仅凭主 agent 的总结标记 resolved。
@@ -387,20 +385,6 @@ Round 3：Final Check / Synthesis / Deliver
 - Round 2 Focused Investigation：
   - D：X 的因果链、替代解释、证据强度、失败边界。
 - Round 3：围绕 X 输出“现象—机制—证据—边界”，不要用 Round 1 背景扫描替代 X 分析。
-
-例 2b：用户上传长 PDF / survey，问“各信道、各场景和各模型下的某个指标怎么计算？研究深入，解释详细公式原理。”
-- 启动前回答焦点表：
-  - F1：论文如何组织这些信道 / 场景 / 模型，depth=overview。
-  - F2：每一类公式如何计算，depth=deep。
-  - F3：公式背后的物理、统计或建模原理是什么，depth=deep。
-- Round 1 Orientation：
-  - A：原文结构与公式定位，按章节 / taxonomy 提取所有相关公式、表格和模型名称。
-  - B：基础物理模型和确定性模型，解释几何、能量守恒、路径损耗、反射或传播项的来源。
-  - C：统计 / 经验 / 测量拟合模型，解释参数如何估计、随机变量代表什么、适用场景是什么。
-  - D：特殊场景或扩展模型，例如遮挡、天气、移动性、RIS / ISAC / 多径等，只在原文确实覆盖时派发。
-- Checkpoint：把公式族建成 answer units，例如 LOS 公式、NLOS / 多径公式、统计拟合公式、特殊环境修正公式；每个公式族都要记录变量、单位、假设、计算步骤、参数来源和边界。
-- Round 2 Focused Investigation：对仍不清楚的公式族逐项补证，不要用“已读完整篇 PDF”替代公式级解释。
-- Round 3：做公式一致性检查，确认最终笔记按“场景 / 模型 -> 公式 -> 变量 -> 原理 -> 适用范围”组织，而不是按 PDF 页码堆公式。
 
 例 3：用户问“这篇综述的 taxonomy 是否合理，有哪些可学习的研究机会？”
 - Round 1 Orientation：
