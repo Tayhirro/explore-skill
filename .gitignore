@@ -1,0 +1,10 @@
+# Local research artifacts produced while using the skill
+tmp/
+outputs/
+*.log
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
