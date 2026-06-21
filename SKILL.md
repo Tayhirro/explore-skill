@@ -294,6 +294,17 @@ AI 应直接使用下面的框架分析当前对象。
    - 每个 candidate unit 都必须标记 promoted / deferred / dropped / resolved，并写明理由。
    - 只有完成 checkpoint，才能进入下一轮调研或最终输出。
 
+4.5. **轮次转换门（强制，不可跳过）**：
+   在进入下一轮（Round N+1）之前，主 agent 必须完成以下全部步骤，**否则禁止派发任何下一轮的子 agent**：
+
+   a. **更新 research.md**：将本轮所有子 agent 的状态更新为 completed / failed / partial，并记录每个子 agent 输出文件的路径。
+   b. **收集 follow-up candidates**：将所有子 agent 返回的 follow-up candidates 合并到 `tmp/followup_candidates.md`，并完成 triage（合并重复、标记优先级、决定 promote / defer / drop）。
+   c. **抽取/更新核心单元**：根据本轮结果抽取或修正 candidate units，按分级规则标记 Core / Secondary / Engineering，并标记 promoted / deferred / dropped / resolved。
+   d. **写入下一轮子任务清单**：在 research.md 中写入 Round N+1 的完整子任务清单，每个子任务包含：编号、角色、方向、状态（pending）、输出文件路径。格式与本节"子任务清单"一致。
+   e. **更新 research_state.md 执行清单**：在顶层执行清单中打勾当前轮次已完成项，并追加下一轮的待办项。
+
+   **硬性约束：Round N+1 的任何一个子 agent 被派发时，research.md 中必须已存在该子任务的条目（编号、角色、方向、输出路径）。不允许"边跑边规划"。**
+
 5. 候选问题升级条件：
    - 当前层无法仅凭原文直接回答；
    - 需要外部论文、综述、经典理论或最新进展查证；
@@ -343,6 +354,7 @@ Round 1 拆分约束（强制）：
 - [ ] Round 1 包含 B-对比与定位（如任务类型要求）
 - [ ] Round 1 包含 C-理论与跨领域依据（如任务类型要求）
 - [ ] 每个核心单元/机制已抽取并标记 high-impact（如任务类型要求）
+- [ ] 轮次转换门已通过（research.md 已更新 Round 1 状态 + Round 2 子任务清单已写入）（如有 Round 2）
 - [ ] Round 2 逐核心单元/机制分析完成（如任务类型要求）
 - [ ] 跨领域概念映射表已填充（≥2 领域，如任务类型要求）
 - [ ] Verification 轮完成（≥5 条断言，如任务类型要求）
@@ -753,6 +765,7 @@ tmp/01-单agent自我合理化问题研究/
    - 如果存在 promoted 但未完成的下一轮任务，不允许写最终笔记；
    - 如果 Round 1 子任务输出文件已存在，但 `research.md` 仍为 pending，必须先更新状态；
    - 如果没有创建 `tmp/followup_candidates.md`，必须说明没有候选问题；否则不允许直接 final。
+   - **轮次转换门合规检查**：对每一个已执行的轮次（Round 1、Round 2、Verification 等），确认 `research.md` 中存在该轮次的完整子任务清单（编号、角色、方向、状态、输出路径）。如果某个轮次的子任务已执行但 research.md 中没有对应条目，说明轮次转换门被跳过，必须先补录子任务清单和状态再进入 Final。
    
    pre-final gate 结构检查项（追加，根据任务类型触发）：
    - 如果任务类型为"单对象深度分析"或更高深度：
