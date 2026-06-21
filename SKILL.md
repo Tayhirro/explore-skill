@@ -302,7 +302,7 @@ AI 应直接使用下面的框架分析当前对象。
    c. **抽取/更新核心单元**：根据本轮结果抽取或修正 candidate units，按分级规则标记 Core / Secondary / Engineering，并标记 promoted / deferred / dropped / resolved。
    d. **写入下一轮子任务清单**：在 research.md 中写入 Round N+1 的完整子任务清单，每个子任务包含：编号、角色、方向、状态（pending）、输出文件路径。格式与本节"子任务清单"一致。
    e. **更新 research_state.md 执行清单**：在顶层执行清单中打勾当前轮次已完成项，并追加下一轮的待办项。
-   f. **重新加载 skill 方法论**：使用 Read 工具重新读取本 SKILL.md 的 Section 5（子 agent 调研提示词模板，含输出结构要求）和当前任务对应的 `tasks/task-*.md`（执行协议），确保下一轮的子 agent prompt 严格基于模板生成，而非凭记忆编写。此步骤在写入 Round N+1 子任务清单（步骤 d）之后、派发子 agent 之前执行。
+   f. **重新加载 skill 方法论并提取搜索来源**：使用 Read 工具重新读取本 SKILL.md 的 Section 5（子 agent 调研提示词模板，含输出结构要求）和当前任务对应的 `tasks/task-*.md`（执行协议）。同时从刚读取的 config-*.md 中提取"四、优先搜索来源"小节的完整内容，在生成每个子 agent 的 prompt 时直接嵌入到 Section 5 模板的"优先搜索来源"位置。此步骤在写入 Round N+1 子任务清单（步骤 d）之后、派发子 agent 之前执行。
 
    **硬性约束：Round N+1 的任何一个子 agent 被派发时，research.md 中必须已存在该子任务的条目（编号、角色、方向、输出路径）。不允许"边跑边规划"。**
 
@@ -474,7 +474,6 @@ status:
 
 - 轮次：round1-retrieval / round2-gapfill / round3-verification
 - 角色：retrieval / gap-fill / verification
-- 配置文件：`explore-skill/config-paper.md` | `config-system.md` | `config-tech.md`（主 agent 必须填写，子 agent 据此自行读取优先搜索来源）
 - 独立问题：
 - 为什么需要单独查证：
 - 需要查：
@@ -577,9 +576,7 @@ tmp/01-单agent自我合理化问题研究/
 ```md
 你现在是一个独立研究 agent。请清空上下文，从零开始研究下面这个任务。
 
-**第一步（强制）**：使用 Read 工具读取下面的配置文件，获取优先搜索来源、角色职责和跨领域映射建议。本次调研的搜索策略必须基于配置文件中的"优先搜索来源"小节，不要自行决定搜索优先级。
-
-配置文件路径：`【主 agent 填入：explore-skill/config-paper.md | config-system.md | config-tech.md】`
+**第一步（强制）**：使用 Read 工具读取 `research.md`，找到分配给你的任务小节，确认你的角色、查证方向和输出位置。
 
 要求：
 - 不要依赖任何先前对话结论；
@@ -646,9 +643,9 @@ tmp/01-单agent自我合理化问题研究/
 
 ## 优先搜索来源
 
-**子 agent 在开始调研前，必须先用 Read 工具读取模板开头指定的配置文件，从中获取"优先搜索来源"小节。** 搜索策略必须严格遵循配置文件中的来源优先级，不得自行决定搜索优先级。
+**主 agent 在生成子 agent 提示词时，必须从步骤 f 刚读取的 config-*.md 中提取"四、优先搜索来源"小节的完整内容，直接粘贴到此处。** 子 agent 不需要自己读 config 文件，搜索策略完全基于此处嵌入的来源列表。
 
-通用规则（配置文件中的来源列表优先于此处的通用规则）：
+通用规则（嵌入的来源列表优先于此处的通用规则）：
 - 优先使用专业来源而非泛搜索引擎。
 - 每条关键结论都要记录来源 URL 或引用信息。
 - 不要把博客、百科当作最终证据；它们最多用于定位关键词和参考文献。
