@@ -302,6 +302,7 @@ AI 应直接使用下面的框架分析当前对象。
    c. **抽取/更新核心单元**：根据本轮结果抽取或修正 candidate units，按分级规则标记 Core / Secondary / Engineering，并标记 promoted / deferred / dropped / resolved。
    d. **写入下一轮子任务清单**：在 research.md 中写入 Round N+1 的完整子任务清单，每个子任务包含：编号、角色、方向、状态（pending）、输出文件路径。格式与本节"子任务清单"一致。
    e. **更新 research_state.md 执行清单**：在顶层执行清单中打勾当前轮次已完成项，并追加下一轮的待办项。
+   f. **重新加载 skill 方法论**：使用 Read 工具重新读取本 SKILL.md 的 Section 5（子 agent 调研提示词模板，含输出结构要求）和当前任务对应的 `tasks/task-*.md`（执行协议），确保下一轮的子 agent prompt 严格基于模板生成，而非凭记忆编写。此步骤在写入 Round N+1 子任务清单（步骤 d）之后、派发子 agent 之前执行。
 
    **硬性约束：Round N+1 的任何一个子 agent 被派发时，research.md 中必须已存在该子任务的条目（编号、角色、方向、输出路径）。不允许"边跑边规划"。**
 
@@ -354,7 +355,7 @@ Round 1 拆分约束（强制）：
 - [ ] Round 1 包含 B-对比与定位（如任务类型要求）
 - [ ] Round 1 包含 C-理论与跨领域依据（如任务类型要求）
 - [ ] 每个核心单元/机制已抽取并标记 high-impact（如任务类型要求）
-- [ ] 轮次转换门已通过（research.md 已更新 Round 1 状态 + Round 2 子任务清单已写入）（如有 Round 2）
+- [ ] 轮次转换门已通过（research.md 已更新状态 + 下一轮子任务清单已写入 + SKILL.md Section 5 和 task-*.md 已重新加载）（如有下一轮）
 - [ ] Round 2 逐核心单元/机制分析完成（如任务类型要求）
 - [ ] 跨领域概念映射表已填充（≥2 领域，如任务类型要求）
 - [ ] Verification 轮完成（≥5 条断言，如任务类型要求）
