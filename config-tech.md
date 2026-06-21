@@ -7,13 +7,17 @@
 
 ## 一、任务类型分流表
 
-| 任务类型 | 触发条件 | 最低执行深度 |
-|---------|---------|------------|
-| 单框架概览 | 用户问"这个框架/方案是什么" | Round 1(A) → Final |
-| 单框架深度分析 | 用户问"设计原理/适用场景/核心机制" | Round 1(A+B+C) → Round 2(逐机制/决策) → Final |
-| 多框架对比分析 | 用户给出 ≥2 个框架并要求逐一分析或对比 | Round 1(A+B+C) → Round 2(逐框架逐机制) → Verification → Final |
-| 领域全景 | 用户问"某类技术的生态/演进" | Round 1(综述+最新进展+标准) → Final |
-| 混合型 | 多框架 + 设计原理 + 领域分析 | 取各类型最高要求的并集 |
+分流后，使用 Read 工具加载对应的 `tasks/task-*.md` 获取该类型的详细执行协议（Round 结构、子 agent 策略、pre-final gate、输出要求）。
+
+| 任务类型 | 触发条件 | 最低执行深度 | config |
+|---------|---------|------------|--------|
+| 单框架概览 | 用户问"这个框架/方案是什么" | Round 1(A) → Final | `tasks/task-overview.md` |
+| 单框架深度分析 | 用户问"设计原理/适用场景/核心机制" | Round 1(A+B+C) → Round 2(逐机制/决策) → Final | `tasks/task-innovation.md` |
+| 多框架对比分析 | 用户给出 ≥2 个框架并要求逐一分析或对比 | Round 1(A+B+C) → Round 2(逐框架逐机制) → Verification → Final | `tasks/task-multi-compare.md` |
+| 机制解释 | 用户问"X 协议如何工作/底层原理/为什么这样设计" | 主 agent 直接分析 → Final（简单）；或 Round 1(A) → Final（需定位） | `tasks/task-mechanism.md` |
+| 判定/评价 | 用户问"方案是否合适""性能声明是否成立""规范是否兼容" | Round 1(A+B) → Final（简单）；或 + Verification → Final（需外部证据） | `tasks/task-evaluation.md` |
+| 领域全景 | 用户问"某类技术的生态/演进" | Round 1(综述+最新进展+标准) → Final | `tasks/task-domain.md` |
+| 混合型 | 多框架 + 设计原理 + 领域分析 | 取各类型最高要求的并集 | 加载所有涉及的 task-*.md |
 
 分流结果必须记录在 research_state.md 顶部，后续每轮 checkpoint 时回查。
 主 agent 不得在 checkpoint 时降级执行深度，除非用户明确同意。
